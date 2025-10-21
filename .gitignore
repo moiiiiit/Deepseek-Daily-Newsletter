@@ -1,5 +1,7 @@
+# Ignore local secret file
+k8s/local-secret.yaml
 # Ignore secrets.yaml files
-**/secrets.yaml
+**/*-secret.yaml
 
 # Python cache and virtual environments
 __pycache__/
