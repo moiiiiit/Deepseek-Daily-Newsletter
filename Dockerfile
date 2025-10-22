@@ -7,12 +7,15 @@ WORKDIR /app
 # Install Poetry
 RUN pip install poetry
 
-# Copy project files
-COPY pyproject.toml poetry.lock* ./
+# Copy project files, excluding .venv and .pytest_cache
+COPY pyproject.toml ./
 COPY . .
+RUN rm -rf .venv .pytest_cache
 
 # Install dependencies using Poetry
-RUN poetry install --no-interaction --no-ansi
+RUN poetry config virtualenvs.create false
+RUN poetry lock
+RUN poetry install --no-interaction --no-ansi --with dev
 
 # Run tests and fail build if they do not pass
 RUN poetry run pytest --maxfail=1 --disable-warnings

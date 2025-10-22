@@ -1,8 +1,11 @@
 remove-pods:
+	microk8s kubectl scale deployment deepseek-newsletter --replicas=0
 	microk8s kubectl delete pods -l app=deepseek-newsletter --ignore-not-found
 
 build:
 	docker build -t deepseek-newsletter:latest .
+	docker tag deepseek-newsletter:latest localhost:32000/deepseek-newsletter:latest
+	docker push localhost:32000/deepseek-newsletter:latest
 
 purge:
 	sudo rm -rf /var/snap/microk8s/common/registry
@@ -21,6 +24,7 @@ apply-local-secret:
 
 apply-manifests:
 	sudo microk8s kubectl apply -f k8s/
+	sudo microk8s kubectl rollout restart deployment deepseek-newsletter
 
 setup:
 	make build
@@ -54,8 +58,6 @@ install:
 	sudo microk8s enable hostpath-storage
 	sudo microk8s kubectl get nodes
 	sudo microk8s enable registry
-	sudo docker tag deepseek-newsletter:latest localhost:32000/deepseek-newsletter:latest
-	sudo docker push localhost:32000/deepseek-newsletter:latest
 	echo "MicroK8s installed and basic networking enabled. Please log out and log back in if you just added yourself to the microk8s or docker group."
 	echo "alias kubectl='microk8s kubectl'" >> ~/.bashrc
 	echo "kubectl is now aliased to microk8s kubectl. Run 'source ~/.bashrc' or open a new shell to use the alias."

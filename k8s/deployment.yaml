@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: deepseek-newsletter
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: deepseek-newsletter
@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: deepseek-newsletter
-        image: deepseek-newsletter:latest
+        image: localhost:32000/deepseek-newsletter:latest
         env:
         - name: DEEPSEEK_API_KEY
           valueFrom:
