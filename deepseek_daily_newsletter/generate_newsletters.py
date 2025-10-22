@@ -51,7 +51,7 @@ def generate_newsletters(send_email_func, sender_email, bcc_emails):
         except Exception as e:
             logger.error(f"Error for model={model}: {e}")
             result = {"error": str(e)}
-        if result:
+        if result and not (isinstance(result, dict) and "error" in result):
             subject = f"Newsletter for model: {model}"
             body = str(result)
             try:
@@ -59,3 +59,5 @@ def generate_newsletters(send_email_func, sender_email, bcc_emails):
                 logger.info(f"Newsletter sent for model={model}")
             except Exception as e:
                 logger.error(f"Email send failed for model={model}: {e}")
+        else:
+            logger.error(f"Skipping email for model={model} due to error: {result}")
