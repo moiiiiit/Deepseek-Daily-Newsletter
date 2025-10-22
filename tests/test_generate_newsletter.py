@@ -23,19 +23,26 @@ def test_generate_newsletters(monkeypatch):
     def dummy_send_email(subject, body, sender_email, bcc_emails):
         sent.append((subject, body, sender_email, bcc_emails))
     import base64
+    sent = []
+    def dummy_send_email(subject, body, sender_email, bcc_emails):
+        sent.append((subject, body, sender_email, bcc_emails))
     prompts = [
         {"model": "model1", "prompt": "prompt1"},
         {"model": "model2", "prompt": "prompt2"}
     ]
-    # Patch OpenAI client
+    # Patch OpenAI client before calling generate_newsletters
     class DummyResponse:
         def json(self):
             return {"result": "mocked"}
     class DummyCompletions:
         def create(self, *args, **kwargs):
             return DummyResponse()
-        monkeypatch.setenv("PROMPTS_JSON", json.dumps(prompts))
-        monkeypatch.setenv("SENDER_EMAIL", "sender@example.com")
+    class DummyChat:
+        completions = DummyCompletions()
+    monkeypatch.setattr(generate_newsletters, "client", type("DummyClient", (), {"chat": DummyChat()})())
+    monkeypatch.setenv("PROMPTS_JSON", json.dumps(prompts))
+    monkeypatch.setenv("SENDER_EMAIL", "sender@example.com")
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "sk-testkey")
     generate_newsletters.generate_newsletters(dummy_send_email, "sender@example.com", ["a@example.com"])
     assert len(sent) == 2
     assert sent[0][0].startswith("Newsletter for model:")
