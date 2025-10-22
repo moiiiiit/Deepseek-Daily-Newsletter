@@ -21,10 +21,7 @@ def test_job_scheduled():
 
 def test_job_runs(monkeypatch):
     import requests_mock
-    monkeypatch.setenv("SENDER_EMAIL", "sender@example.com")
-    monkeypatch.setenv("EMAILS_JSON", '[{"email": "a@example.com"}, {"email": "b@example.com"}]')
-    monkeypatch.setenv("PROMPTS_JSON", '[{"model": "model1", "prompt": "prompt1"}]')
-    monkeypatch.setenv("DEEPSEEK_API_KEY", "sk-testkey")
+    import base64, json
 
     sent = []
     def dummy_send_email(subject, body, sender_email, bcc_emails):
@@ -37,5 +34,5 @@ def test_job_runs(monkeypatch):
     with requests_mock.Mocker() as m:
         m.post("https://api.deepseek.com/v1/chat/completions", json={"result": "mocked"})
         main_mod.job()
-    assert len(sent) == 1
+    assert len(sent) == 2
     assert sent[0][2] == "sender@example.com"

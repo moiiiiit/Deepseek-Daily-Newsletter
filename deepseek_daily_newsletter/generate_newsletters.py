@@ -3,6 +3,7 @@ import yaml
 import json
 import requests
 import os
+import base64
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 
@@ -10,9 +11,10 @@ def load_api_key():
     return os.environ.get('DEEPSEEK_API_KEY')
 
 def load_prompts():
-    prompts_json = os.environ.get('PROMPTS_JSON')
-    if not prompts_json:
+    prompts_json_b64 = os.environ.get('PROMPTS_JSON')
+    if not prompts_json_b64:
         raise ValueError("PROMPTS_JSON not found in environment variables")
+    prompts_json = base64.b64decode(prompts_json_b64).decode('utf-8')
     return json.loads(prompts_json)
 
 def call_deepseek_api(api_key, model, prompt):

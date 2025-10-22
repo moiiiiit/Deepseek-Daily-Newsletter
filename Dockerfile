@@ -12,6 +12,10 @@ COPY pyproject.toml ./
 COPY . .
 RUN rm -rf .venv .pytest_cache
 
+# Copy and set executable for run_newsletter.sh
+COPY scripts/run_newsletter.sh /app/run_newsletter
+RUN chmod +x /app/run_newsletter
+
 # Install dependencies using Poetry
 RUN poetry config virtualenvs.create false
 RUN poetry lock

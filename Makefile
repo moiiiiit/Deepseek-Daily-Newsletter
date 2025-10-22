@@ -1,35 +1,31 @@
 cleanup-pods:
-	microk8s kubectl delete pods -l app=deepseek-newsletter --ignore-not-found
-	microk8s kubectl delete deployment deepseek-newsletter --ignore-not-found
-	microk8s kubectl apply -f k8s/deployment.yaml
-
-remove-pods:
-	microk8s kubectl scale deployment deepseek-newsletter --replicas=0
-	microk8s kubectl delete pods -l app=deepseek-newsletter --ignore-not-found
+	microk8s kubectl scale deployment deepseek-newsletter --replicas=0 2>&1
+	microk8s kubectl delete pods -l app=deepseek-newsletter --ignore-not-found 2>&1
+	microk8s kubectl delete deployment deepseek-newsletter --ignore-not-found 2>&1
 
 build:
-	docker build -t deepseek-newsletter:latest .
-	docker tag deepseek-newsletter:latest localhost:32000/deepseek-newsletter:latest
-	docker push localhost:32000/deepseek-newsletter:latest
+	docker build -t deepseek-newsletter:latest . 2>&1
+	docker tag deepseek-newsletter:latest localhost:32000/deepseek-newsletter:latest 2>&1
+	docker push localhost:32000/deepseek-newsletter:latest 2>&1
 
 purge:
-	sudo rm -rf /var/snap/microk8s/common/registry
-	echo "MicroK8s registry data has been purged."
+	sudo rm -rf /var/snap/microk8s/common/registry 2>&1
+	echo "MicroK8s registry data has been purged." 2>&1
 
 uninstall:
-	sudo microk8s stop || true
-	sudo snap remove microk8s
-	sudo rm -rf /var/snap/microk8s
-	sudo rm -rf /var/snap/microk8s/common/registry
-	sudo rm -rf ~/.kube
-	echo "MicroK8s and all registry/configuration data have been removed."
+	sudo microk8s stop || true 2>&1
+	sudo snap remove microk8s 2>&1
+	sudo rm -rf /var/snap/microk8s 2>&1
+	sudo rm -rf /var/snap/microk8s/common/registry 2>&1
+	sudo rm -rf ~/.kube 2>&1
+	echo "MicroK8s and all registry/configuration data have been removed." 2>&1
 
 apply-local-secret:
-	bash apply-local-secret.sh
+	bash apply-local-secret.sh 2>&1
 
 apply-manifests:
-	sudo microk8s kubectl apply -f k8s/
-	sudo microk8s kubectl rollout restart deployment deepseek-newsletter
+	sudo microk8s kubectl apply -f k8s/ 2>&1
+	sudo microk8s kubectl rollout restart deployment deepseek-newsletter 2>&1
 
 run:
 	make build
