@@ -17,7 +17,7 @@ spec:
         image: localhost:32000/deepseek-newsletter:latest
         envFrom:
         - secretRef:
-            name: deepseek-secrets
+            name: deepseek-email-secrets
         readinessProbe:
           exec:
             command:

@@ -20,19 +20,25 @@ def test_job_scheduled():
     assert found, "No job scheduled for Monday at 08:00"
 
 def test_job_runs(monkeypatch):
-    import requests_mock
-    import base64, json
-
     sent = []
     def dummy_send_email(subject, body, sender_email, bcc_emails):
         sent.append((subject, body, sender_email, bcc_emails))
+
+    # Patch OpenAI client
+    class DummyResponse:
+        def json(self):
+            return {"result": "mocked"}
+    class DummyCompletions:
+        def create(self, *args, **kwargs):
+            return DummyResponse()
+    class DummyChat:
+        completions = DummyCompletions()
+    monkeypatch.setattr(gn, "client", type("DummyClient", (), {"chat": DummyChat()})())
 
     main_mod.generate_newsletters = gn.generate_newsletters
     main_mod._sender_email = "sender@example.com"
     main_mod._bcc_emails = ["a@example.com", "b@example.com"]
     main_mod.job = lambda: gn.generate_newsletters(dummy_send_email, main_mod._sender_email, main_mod._bcc_emails)
-    with requests_mock.Mocker() as m:
-        m.post("https://api.deepseek.com/v1/chat/completions", json={"result": "mocked"})
-        main_mod.job()
+    main_mod.job()
     assert len(sent) == 2
     assert sent[0][2] == "sender@example.com"

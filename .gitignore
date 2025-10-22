@@ -1,8 +1,3 @@
-# Ignore local secret file
-k8s/local-secret.yaml
-# Ignore secrets.yaml files
-**/*-secret.yaml
-
 # Python cache and virtual environments
 __pycache__/
 *.pyc
@@ -19,3 +14,4 @@ Thumbs.db
 # IDE/editor files
 .vscode/
 .idea/
+k8s/secrets.yaml

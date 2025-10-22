@@ -1,43 +1,41 @@
+
 from .logger import logger
 import yaml
 import json
 import requests
 import os
-import base64
+from openai import OpenAI
+
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 
 def load_api_key():
-    return os.environ.get('DEEPSEEK_API_KEY')
+    api_key = os.environ.get('DEEPSEEK_API_KEY')
+    if not api_key:
+        raise ValueError("DEEPSEEK_API_KEY not found in environment variables")
+    return api_key
+client = OpenAI(api_key=load_api_key(), base_url="https://api.deepseek.com")
 
 def load_prompts():
-    prompts_json_b64 = os.environ.get('PROMPTS_JSON')
-    if not prompts_json_b64:
+    prompts_json = os.environ.get('PROMPTS_JSON')
+    if not prompts_json:
         raise ValueError("PROMPTS_JSON not found in environment variables")
-    prompts_json = base64.b64decode(prompts_json_b64).decode('utf-8')
     return json.loads(prompts_json)
 
 def call_deepseek_api(api_key, model, prompt):
-    url = 'https://api.deepseek.com/v1/chat/completions'
-    headers = {
-        'Authorization': f'Bearer {api_key}',
-        'Content-Type': 'application/json'
-    }
-    data = {
-        'model': model,
-        'messages': [
-            {'role': 'user', 'content': prompt}
-        ]
-    }
-    logger.info(f"Calling Deepseek API with model={model}")
-    response = requests.post(url, headers=headers, json=data)
     try:
-        response.raise_for_status()
-        logger.info("Deepseek API call successful")
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant"},
+                {"role": "user", "content": prompt},
+            ],
+            stream=False
+        )
+        return response.json()
     except Exception as e:
         logger.error(f"Deepseek API call failed: {e}")
-        raise
-    return response.json()
+        return {"error": str(e)}
 
 
 # This function generates newsletters for all prompts and sends emails for each
@@ -48,8 +46,16 @@ def generate_newsletters(send_email_func, sender_email, bcc_emails):
         model = item['model']
         prompt = item['prompt']
         logger.info(f"Generating newsletter for model={model}")
-        result = call_deepseek_api(api_key, model, prompt)
-        subject = f"Newsletter for model: {model}"
-        body = str(result)
-        send_email_func(subject, body, sender_email, bcc_emails)
-        logger.info(f"Newsletter sent for model={model}")
+        try:
+            result = call_deepseek_api(api_key, model, prompt)
+        except Exception as e:
+            logger.error(f"Error for model={model}: {e}")
+            result = {"error": str(e)}
+        if result:
+            subject = f"Newsletter for model: {model}"
+            body = str(result)
+            try:
+                send_email_func(subject, body, sender_email, bcc_emails)
+                logger.info(f"Newsletter sent for model={model}")
+            except Exception as e:
+                logger.error(f"Email send failed for model={model}: {e}")
