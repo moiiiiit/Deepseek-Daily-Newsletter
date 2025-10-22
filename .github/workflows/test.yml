@@ -12,13 +12,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-      - name: Install Poetry
-        run: pip install poetry
-      - name: Install dependencies
-        run: poetry install --no-interaction
-      - name: Run tests
-        run: poetry run pytest
+      - name: Build test-only Docker image
+        run: docker build --target test-only -t newsletter-test .
+      - name: Run tests in Docker container
+        run: docker run --rm newsletter-test

@@ -4,7 +4,7 @@ cleanup-pods:
 	microk8s kubectl delete deployment deepseek-newsletter --ignore-not-found 2>&1
 
 build:
-	docker build -t deepseek-newsletter:latest . 2>&1
+	docker build --target prod -t deepseek-newsletter:latest . 2>&1
 	docker tag deepseek-newsletter:latest localhost:32000/deepseek-newsletter:latest 2>&1
 	docker push localhost:32000/deepseek-newsletter:latest 2>&1
 
