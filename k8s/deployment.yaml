@@ -15,22 +15,9 @@ spec:
       containers:
       - name: deepseek-newsletter
         image: localhost:32000/deepseek-newsletter:latest
-        env:
-        - name: DEEPSEEK_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: deepseek-secrets
-              key: DEEPSEEK_API_KEY
-        - name: EMAILS_JSON
-          valueFrom:
-            secretKeyRef:
-              name: deepseek-secrets
-              key: EMAILS_JSON
-        - name: PROMPTS_JSON
-          valueFrom:
-            secretKeyRef:
-              name: deepseek-secrets
-              key: PROMPTS_JSON
+        envFrom:
+        - secretRef:
+            name: deepseek-secrets
         readinessProbe:
           exec:
             command:

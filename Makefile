@@ -24,7 +24,10 @@ apply-local-secret:
 	bash apply-local-secret.sh 2>&1
 
 apply-manifests:
-	sudo microk8s kubectl apply -f k8s/ 2>&1
+	sudo microk8s kubectl apply -f k8s/deployment.yaml 2>&1
+	sudo microk8s kubectl apply -f k8s/service.yaml 2>&1
+	sudo microk8s kubectl apply -f k8s/secret.yaml
+	sudo microk8s kubectl apply -f k8s/local-secret.yaml
 	sudo microk8s kubectl rollout restart deployment deepseek-newsletter 2>&1
 
 run:
