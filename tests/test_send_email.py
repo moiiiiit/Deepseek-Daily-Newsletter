@@ -10,14 +10,16 @@ def test_send_email_function_exists():
 def test_send_email_sends(monkeypatch):
     sent = {}
     class DummySMTP:
-        def __init__(self, host): pass
+        def __init__(self, host, port=None): pass
         def __enter__(self): return self
         def __exit__(self, exc_type, exc_val, exc_tb): pass
+        def starttls(self): pass
+        def login(self, username, password): pass
         def send_message(self, msg):
             sent['msg'] = msg
 
     monkeypatch.setattr("smtplib.SMTP", DummySMTP)
-    
+
     subject = "Test Subject"
     body = "Test Body"
     sender_email = "test@example.com"

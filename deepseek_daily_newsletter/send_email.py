@@ -1,6 +1,7 @@
 from .logger import logger
 import smtplib
 from email.message import EmailMessage
+import os
 
 def send_email(subject, body, sender_email, bcc_emails):
     logger.info(f"Preparing email: subject={subject}, sender={sender_email}, bcc={bcc_emails}")
