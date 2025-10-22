@@ -1,18 +1,31 @@
+[tool.poetry]
+name = "deepseek-daily-newsletter"
+version = "0.1.0"
+description = ""
+authors = ["Mohit Bhole <mohitb.steam@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = ">=3.10"
+PyYAML = "*"
+requests = "*"
+schedule = "*"
+python-dotenv = "*"
+requests-mock = "^1.12.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "*"
+
+[tool.poetry.group.dev.dependencies]
+pytest-watch = "^4.2.0"
+
 [project]
 name = "deepseek-daily-newsletter"
 version = "0.1.0"
 description = ""
-authors = [
-    {name = "Mohit Bhole",email = "mohitb.steam@gmail.com"}
-]
+authors = [{name = "Mohit Bhole",email = "mohitb.steam@gmail.com"}]
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = [
-    "PyYAML",
-    "requests",
-    "schedule",
-    "pytest",
-]
+dependencies = ["PyYAML", "requests", "schedule", "pytest"]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

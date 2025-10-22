@@ -1,16 +1,22 @@
+
 import time
 import threading
 import schedule
-from .generate_newsletter import main as generate_newsletter
+import os
+import json
+from .generate_newsletters import generate_newsletters
 from .send_email import send_email
 
-def job():
-    # Generate newsletter and send email
-    result = generate_newsletter()
-    subject = "Weekly Deepseek EV Technology Digest"
-    body = str(result)
-    send_email(subject, body)
+# Cache sender_email and bcc_emails at module level
+_sender_email = os.environ.get('SENDER_EMAIL')
+_emails_json = os.environ.get('EMAILS_JSON')
+if not _emails_json:
+    raise ValueError("EMAILS_JSON not found in environment variables")
+_recipients = json.loads(_emails_json)
+_bcc_emails = [r['email'] for r in _recipients]
 
+def job():
+    generate_newsletters(send_email, _sender_email, _bcc_emails)
 
 def setup_scheduler():
     schedule.every().monday.at("08:00").do(job)
