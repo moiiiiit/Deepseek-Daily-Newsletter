@@ -1,3 +1,4 @@
+from .logger import logger
 
 import time
 import threading
@@ -20,11 +21,11 @@ def job():
 
 def setup_scheduler():
     schedule.every().monday.at("08:00").do(job)
-    print("Scheduler job scheduled for Monday 8am.")
+    logger.info("Scheduler job scheduled for Monday 8am.")
 
 def run_scheduler():
     setup_scheduler()
-    print("Scheduler started. Waiting for Monday 8am...")
+    logger.info("Scheduler started. Waiting for Monday 8am...")
     while True:
         schedule.run_pending()
         time.sleep(30)
@@ -33,4 +34,10 @@ def main():
     run_scheduler()
 
 if __name__ == "__main__":
-    main()
+    import sys
+    if "--run-now" in sys.argv:
+        from .generate_newsletters import generate_newsletters
+        from .send_email import send_email
+        generate_newsletters(send_email, _sender_email, _bcc_emails)
+    else:
+        main()

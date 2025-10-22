@@ -1,3 +1,8 @@
+cleanup-pods:
+	microk8s kubectl delete pods -l app=deepseek-newsletter --ignore-not-found
+	microk8s kubectl delete deployment deepseek-newsletter --ignore-not-found
+	microk8s kubectl apply -f k8s/deployment.yaml
+
 remove-pods:
 	microk8s kubectl scale deployment deepseek-newsletter --replicas=0
 	microk8s kubectl delete pods -l app=deepseek-newsletter --ignore-not-found
@@ -26,7 +31,7 @@ apply-manifests:
 	sudo microk8s kubectl apply -f k8s/
 	sudo microk8s kubectl rollout restart deployment deepseek-newsletter
 
-setup:
+run:
 	make build
 	make apply-local-secret
 	make apply-manifests

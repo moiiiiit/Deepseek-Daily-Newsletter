@@ -20,5 +20,5 @@ RUN poetry install --no-interaction --no-ansi --with dev
 # Run tests and fail build if they do not pass
 RUN poetry run pytest --maxfail=1 --disable-warnings
 
-# Set entrypoint to main.py
-CMD ["poetry", "run", "python", "main.py"]
+# Set entrypoint to main.py in the package
+CMD ["poetry", "run", "python", "-m", "deepseek_daily_newsletter.main"]

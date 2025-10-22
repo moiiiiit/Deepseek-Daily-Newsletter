@@ -1,3 +1,4 @@
+from .logger import logger
 import yaml
 import json
 import requests
@@ -26,8 +27,14 @@ def call_deepseek_api(api_key, model, prompt):
             {'role': 'user', 'content': prompt}
         ]
     }
+    logger.info(f"Calling Deepseek API with model={model}")
     response = requests.post(url, headers=headers, json=data)
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+        logger.info("Deepseek API call successful")
+    except Exception as e:
+        logger.error(f"Deepseek API call failed: {e}")
+        raise
     return response.json()
 
 
@@ -38,7 +45,9 @@ def generate_newsletters(send_email_func, sender_email, bcc_emails):
     for item in prompts:
         model = item['model']
         prompt = item['prompt']
+        logger.info(f"Generating newsletter for model={model}")
         result = call_deepseek_api(api_key, model, prompt)
         subject = f"Newsletter for model: {model}"
         body = str(result)
         send_email_func(subject, body, sender_email, bcc_emails)
+        logger.info(f"Newsletter sent for model={model}")
